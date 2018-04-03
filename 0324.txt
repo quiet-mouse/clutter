@@ -1,0 +1,154 @@
+style.display = style.display == "block" ? "none" : "block"
+
+oInput.onkeyup = function ()
+{
+	this.value = this.value.replace(/[^(\d)|(,)]/,"")
+}
+
+oBtn.onclick = function(){
+	oLay.style.display = "block";
+	oWin.style.display = "block";
+}
+别误写成
+     \||/
+      \/
+oBtn.click = function(){
+	oLay.style.display = "block";
+	oWin.style.display = "block";
+}
+
+修改元素的属性函数
+var changeStyle = function (elem, name, value) {
+	elem.style[name] = value	
+}
+
+zoom:1;
+通常是用来清除浮动、避免容器高度崩塌的。
+.container:after {
+  content:"";
+  display:table;
+  clear:both;
+}
+
+1.检查标签是否闭合2.清除浮动3.样式排除法
+
+
+window.onload = function ()
+{
+	var oLi = document.getElementsByTagName("li");	
+	for (var i = 0; i < oLi.length; i++)
+	{
+		oLi[i].onmouseover = function ()
+		{
+			this.className = "current"	
+		};
+		oLi[i].onmouseout = function ()
+		{
+			this.className = ""	
+		}
+	}
+}
+
+
+函数运行时变量如果可以访问,则变量在作用域内
+间接访问执行环境对象很容易,每次使用变量,就是在访问执行环境对象的属性.
+
+JavaScript分两轮处理执行环境,
+第一轮:
+1声明并初始化函数参数
+3声明并初始化函数
+2声明局部变量,将匿名函数赋给一个局部变量,但不初始化它们
+
+参数被赋值了,因为在向函数传递参数前,任何决定参数值的代码都已经运行了
+
+JavaScript引擎在执行环境对象中访问作用域内的变量,查找的顺序叫做作用域链, 它和原型链一起, 描述JavaScript访问变量和属性的顺序.
+
+JavaScript会检索作用域层级来解析变量名,它从当前作用域开始, 按它的查找方式回到顶级的作用域,即window或global对象.它使用找到的第一次匹配,并停止查找.这意味着在层级更深的嵌套作用域中的变量,会使用它们当前作用域替换更加全局的作用域
+
+
+Object.create
+
+var proto = {
+	sentence:4,
+	probation:2
+};
+var firstPrisoner = Object.create(proto);
+firstPrisoner.name = 'Joe';
+firstPrisoner.id = '12A';
+var secondPrisoner = Object.create(proto);
+secondPrisoner.name = 'Sam';
+secondPrisoner.id = '12B';
+
+但每次都手动设置name id 很痛苦, 而且代码重复
+使用Object.create 的常见模式是使用 工厂函数来创建并返回最终的对象
+
+var proto = {
+	sentence:4,
+	probation:2
+};
+var makePrisoner = function(name, id){
+	var prisoner = Object.create(proto);
+	prisoner.name = name;
+	prisoner.id = id;
+	return prisoner;
+}
+var firstPrisoner = makePrisoner('Joe', '12A');
+var firstPrisoner = makePrisoner('Sam', '12B');
+
+
+//老式浏览器上的Object.create 
+//当Object.create 不存在时,我们需自己定义这个方法
+var objectCreate = function(arg){
+	if(!arg){
+		return {};
+	}
+	function obj(){};
+	obj.prototype = arg;
+	return new obj;
+}
+Object.create = Object.create || objectCreate;
+
+JavaScript使用原型链来解析属性值。
+请求对象属性 -- 在该对象查找 --(找不到)-- 查找原型(在对象的__proto__属性里) --(找不到)-- 查找原型的原型(原型是一个对象,它也有原型) 
+以此类推,当JavaScript到达通用的(generic)Object的原型, 原型链就结束了.
+当在原型链上找不到请求属性时,返回undefined.
+
+
+fisrtPrisoner -- firstPrisoner.__proto__ -- firstPrisoner.__proto__.__proto__
+
+
+在全局作用域中定义的所有东西在每个地方都是可用的. 有时候你不想和所有人共享, 不想第三方库共享它们的内部变量,这会容易覆盖对方的库,从而导致难以诊断的问题.
+--自执行匿名函数 
+--可以把整个程序封装在函数中,调用这个函数,这样外部代码就不能访问到变量了
+
+(function(){
+	var private_variable = "private";
+})();
+console.log(private_variable);
+这叫做 自执行匿名函数  ,因为定义它时没有名字且没有保存给变量,但却立即执行了.
+它被用来控制变量的作用域,阻止变量泄漏到代码其他地方.可用于创建JavaScript插件,不会和应用代码冲突,因为它不会向全局名字空间添加任何变量.
+----还有个模式模块的东西.
+
+显式调用						自执行函数
+var foo = function(){			(function(){
+	//code							//code						
+};								})();
+foo();
+
+
+var eatFunction = function(what_to_eat){
+	var sentence = 'I am going to eat a' + what_to_eat;
+	console.log(sentence);
+}
+eatFunction('Sandwich');
+
+//is the same as
+
+(function(what_to_eat){
+	var sentence = 'I am going to eat a '+what_to_eat;
+	console.log(sentence);
+})('sandwich');
+
+一个很著名的阻止变量被覆盖的例子是使用 jquery和 Prototype Javascript库。它们都大量使用了字符变量$。如果在应用中同时引入了这两个库,则最后添加的库将控制$。将变量传递给自执行匿名函数的技巧,可以用来保证在一块代码里面, jquery可以使用$变量。对于这个例子,你应该知道 jquery和$变量是彼此的别名。将 jquery变量传递给参数为$的自执行匿名函数,就能避免$被 Prototype库占用了。
+
+
